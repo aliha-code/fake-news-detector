@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Fake News Detector</title>
+
+    <style>
+        body {
+            font-family: Arial;
+            background: linear-gradient(to right, #667eea, #764ba2);
+            color: white;
+            text-align: center;
+            padding: 50px;
+        }
+
+        .container {
+            background: white;
+            color: black;
+            padding: 30px;
+            border-radius: 15px;
+            width: 60%;
+            margin: auto;
+        }
+
+        textarea {
+            width: 90%;
+            height: 120px;
+            padding: 10px;
+            border-radius: 10px;
+            border: 1px solid #ccc;
+            font-size: 16px;
+        }
+
+        button {
+            margin-top: 15px;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            background: #667eea;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        #result {
+            margin-top: 20px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .bar-container {
+            width: 100%;
+            background: #ddd;
+            border-radius: 10px;
+            margin-top: 10px;
+        }
+
+        .bar {
+            height: 20px;
+            border-radius: 10px;
+            width: 0%;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>🧠 Fake News Detection Platform</h1>
+
+    <div class="container">
+
+        <textarea id="newsText" placeholder="Paste news here..."></textarea><br>
+
+        <button onclick="checkNews()">Check News</button>
+
+        <div id="result"></div>
+
+        <div class="bar-container">
+            <div id="scoreBar" class="bar"></div>
+        </div>
+
+    </div>
+
+    <script>
+        function checkNews() {
+            let text = document.getElementById("newsText").value;
+
+            fetch('/predict', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ text: text })
+            })
+            .then(response => response.json())
+            .then(data => {
+
+                let resultDiv = document.getElementById("result");
+                let bar = document.getElementById("scoreBar");
+
+                resultDiv.innerText =
+                    `Prediction: ${data.prediction}
+Score: ${data.score}%
+Reason: ${data.reason}`;
+
+                // Color logic
+                if (data.prediction === "Real") {
+                    resultDiv.style.color = "green";
+                    bar.style.background = "green";
+                } else {
+                    resultDiv.style.color = "red";
+                    bar.style.background = "red";
+                }
+
+                // Progress bar
+                bar.style.width = data.score + "%";
+            });
+        }
+    </script>
+
+</body>
+</html>
