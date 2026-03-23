@@ -81,41 +81,40 @@
     </div>
 
     <script>
-        function checkNews() {
-            let text = document.getElementById("newsText").value;
+    function checkNews() {
+        let text = document.getElementById("newsText").value;
 
-            fetch('/predict', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ text: text })
-            })
-            .then(response => response.json())
-            .then(data => {
+        fetch('https://fake-news-detector-waqm.onrender.com/predict', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ text: text })
+        })
+        .then(response => response.json())
+        .then(data => {
 
-                let resultDiv = document.getElementById("result");
-                let bar = document.getElementById("scoreBar");
+            let resultDiv = document.getElementById("result");
+            let bar = document.getElementById("scoreBar");
 
-                resultDiv.innerText =
-                    `Prediction: ${data.prediction}
+            resultDiv.innerText =
+                `Prediction: ${data.prediction}
 Score: ${data.score}%
 Reason: ${data.reason}`;
 
-                // Color logic
-                if (data.prediction === "Real") {
-                    resultDiv.style.color = "green";
-                    bar.style.background = "green";
-                } else {
-                    resultDiv.style.color = "red";
-                    bar.style.background = "red";
-                }
+            if (data.prediction === "Real") {
+                resultDiv.style.color = "green";
+                bar.style.background = "green";
+            } else {
+                resultDiv.style.color = "red";
+                bar.style.background = "red";
+            }
 
-                // Progress bar
-                bar.style.width = data.score + "%";
-            });
-        }
-    </script>
-
-</body>
-</html>
+            bar.style.width = data.score + "%";
+        })
+        .catch(error => {
+            console.log(error);
+            document.getElementById("result").innerText = "Error connecting to server";
+        });
+    }
+</script>
