@@ -1,37 +1,8 @@
-import pandas as pd
-from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.linear_model import LogisticRegression
+import pickle
 
-print("Loading dataset...")
+model = pickle.load(open("model.pkl", "rb"))
+vectorizer = pickle.load(open("vectorizer.pkl", "rb"))
 
-# Load datasets
-fake = pd.read_csv("Fake.csv")
-true = pd.read_csv("True.csv")
-
-# Add labels
-fake["label"] = 0
-true["label"] = 1
-
-# Combine datasets
-data = pd.concat([fake, true])
-
-print("Training model...")
-
-# Input and output
-X = data["text"]
-y = data["label"]
-
-# Convert text to numbers
-vectorizer = TfidfVectorizer(stop_words='english', max_df=0.7)
-X = vectorizer.fit_transform(X)
-
-# Train model (ONLY ONE MODEL)
-model = LogisticRegression(max_iter=1000)
-model.fit(X, y)
-
-print("Model trained successfully!")
-
-# Prediction function
 def predict_news(text):
     vec = vectorizer.transform([text])
     result = model.predict(vec)[0]
