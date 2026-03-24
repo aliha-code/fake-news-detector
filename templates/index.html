@@ -97,10 +97,15 @@
             let resultDiv = document.getElementById("result");
             let bar = document.getElementById("scoreBar");
 
-            resultDiv.innerText =
-                `Prediction: ${data.prediction}
-Score: ${data.score}%
-Reason: ${data.reason}`;
+let sourceText = "";
+
+if (data.prediction === "Real") {
+    sourceText = "\nSource: Verified from trusted news outlets";
+}
+
+resultDiv.innerText =
+    `Prediction: ${data.prediction}
+Score: ${data.score}%${sourceText}`;
 
             if (data.prediction === "Real") {
                 resultDiv.style.color = "green";
