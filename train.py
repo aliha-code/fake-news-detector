@@ -18,7 +18,12 @@ y = data["label"]
 
 print("Training model...")
 
-vectorizer = TfidfVectorizer(stop_words='english', max_df=0.7)
+vectorizer = TfidfVectorizer(
+    stop_words='english',
+    max_df=0.7,
+    ngram_range=(1, 2),
+    max_features=5000
+)
 X = vectorizer.fit_transform(X)
 
 model = LogisticRegression(max_iter=1000)

@@ -97,15 +97,19 @@
             let resultDiv = document.getElementById("result");
             let bar = document.getElementById("scoreBar");
 
-let sourceText = "";
+ let sourceHTML = "";
 
-if (data.prediction === "Real") {
-    sourceText = "\nSource: Verified from trusted news outlets";
+if (data.sources && data.sources.length > 0) {
+    sourceHTML = "<br><br><b>Sources:</b><br>";
+
+    data.sources.forEach((src, index) => {
+        sourceHTML += `<a href="${src}" target="_blank">${index + 1}. Open Source</a><br>`;
+    });
 }
 
-resultDiv.innerText =
-    `Prediction: ${data.prediction}
-Score: ${data.score}%${sourceText}`;
+resultDiv.innerHTML =
+    `Prediction: ${data.prediction}<br>
+     Score: ${data.score}%${sourceHTML}`;
 
             if (data.prediction === "Real") {
                 resultDiv.style.color = "green";
