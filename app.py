@@ -1,4 +1,5 @@
 print("App is starting...")
+
 import os
 import requests
 from flask import Flask, render_template, request, jsonify
@@ -6,17 +7,23 @@ from model import predict_news
 
 app = Flask(__name__)
 
+# Home route
 @app.route('/')
 def home():
     return render_template("index.html")
 
+
+# Prediction route
 @app.route('/predict', methods=['POST'])
 def predict():
     text = request.json['text']
-# from model import predict_news
+
+    # 🔥 Get prediction from model
+    result, prob = predict_news(text)
 
     sources = []
 
+    # 📰 Fetch real news sources if prediction is REAL
     if result == 1:
         try:
             api_key = os.getenv("NEWS_API_KEY")
@@ -29,11 +36,16 @@ def predict():
         except:
             sources = []
 
+    # Return response
     return jsonify({
         "prediction": "Real" if result == 1 else "Fake",
         "score": round(prob * 100, 2),
         "sources": sources
     })
+
+
+# Run app (Render compatible)
 if __name__ == "__main__":
     print("Starting Flask server...")
-    app.run(host="0.0.0.0", port=5000, debug=True)
+    port = int(os.environ.get("PORT", 10000))
+    app.run(host="0.0.0.0", port=port)
