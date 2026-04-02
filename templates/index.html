@@ -1,3 +1,4 @@
+<script>
 function checkNews() {
     let text = document.getElementById("newsText").value;
 
@@ -12,7 +13,6 @@ function checkNews() {
     })
     .then(response => response.json())
     .then(data => {
-
         let resultDiv = document.getElementById("result");
         let bar = document.getElementById("scoreBar");
 
@@ -45,3 +45,6 @@ function checkNews() {
         document.getElementById("result").innerText = "Error connecting to server";
     });
 }
+</script>
+</body>
+</html>
