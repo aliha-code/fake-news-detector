@@ -1,129 +1,47 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Fake News Detector</title>
+function checkNews() {
+    let text = document.getElementById("newsText").value;
 
-    <style>
-        body {
-            font-family: Arial;
-            background: linear-gradient(to right, #667eea, #764ba2);
-            color: white;
-            text-align: center;
-            padding: 50px;
+    document.getElementById("result").innerHTML = "";
+
+    fetch('https://fake-news-detector-waqm.onrender.com/predict', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ text: text })
+    })
+    .then(response => response.json())
+    .then(data => {
+
+        let resultDiv = document.getElementById("result");
+        let bar = document.getElementById("scoreBar");
+
+        let sourceHTML = "";
+
+        if (data.sources && data.sources.length > 0) {
+            sourceHTML = "<br><br><b>Sources:</b><br>";
+
+            data.sources.forEach((src, index) => {
+                sourceHTML += `<a href="${src}" target="_blank">${index + 1}. Open Article</a><br>`;
+            });
         }
 
-        .container {
-            background: white;
-            color: black;
-            padding: 30px;
-            border-radius: 15px;
-            width: 60%;
-            margin: auto;
+        resultDiv.innerHTML =
+            `Prediction: ${data.prediction}<br>
+             Score: ${data.score}%${sourceHTML}`;
+
+        if (data.prediction === "Real") {
+            resultDiv.style.color = "green";
+            bar.style.background = "green";
+        } else {
+            resultDiv.style.color = "red";
+            bar.style.background = "red";
         }
 
-        textarea {
-            width: 90%;
-            height: 120px;
-            padding: 10px;
-            border-radius: 10px;
-            border: 1px solid #ccc;
-            font-size: 16px;
-        }
-
-        button {
-            margin-top: 15px;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 8px;
-            background: #667eea;
-            color: white;
-            font-size: 16px;
-            cursor: pointer;
-        }
-
-        #result {
-            margin-top: 20px;
-            font-size: 18px;
-            font-weight: bold;
-        }
-
-        .bar-container {
-            width: 100%;
-            background: #ddd;
-            border-radius: 10px;
-            margin-top: 10px;
-        }
-
-        .bar {
-            height: 20px;
-            border-radius: 10px;
-            width: 0%;
-        }
-    </style>
-</head>
-
-<body>
-
-    <h1>🧠 Fake News Detection Platform</h1>
-
-    <div class="container">
-
-        <textarea id="newsText" placeholder="Paste news here..."></textarea><br>
-
-        <button onclick="checkNews()">Check News</button>
-
-        <div id="result"></div>
-
-        <div class="bar-container">
-            <div id="scoreBar" class="bar"></div>
-        </div>
-
-    </div>
-
-    <script>
-    function checkNews() {
-        let text = document.getElementById("newsText").value;
-
-        fetch('https://fake-news-detector-waqm.onrender.com/predict', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ text: text })
-        })
-        .then(response => response.json())
-        .then(data => {
-
-            let resultDiv = document.getElementById("result");
-            let bar = document.getElementById("scoreBar");
-
- let sourceHTML = "";
-
-if (data.sources && data.sources.length > 0) {
-    sourceHTML = "<br><br><b>Sources:</b><br>";
-
-    data.sources.forEach((src, index) => {
-        sourceHTML += `<a href="${src}" target="_blank">${index + 1}. Open Source</a><br>`;
+        bar.style.width = data.score + "%";
+    })
+    .catch(error => {
+        console.log(error);
+        document.getElementById("result").innerText = "Error connecting to server";
     });
 }
-
-resultDiv.innerHTML =
-    `Prediction: ${data.prediction}<br>
-     Score: ${data.score}%${sourceHTML}`;
-
-            if (data.prediction === "Real") {
-                resultDiv.style.color = "green";
-                bar.style.background = "green";
-            } else {
-                resultDiv.style.color = "red";
-                bar.style.background = "red";
-            }
-
-            bar.style.width = data.score + "%";
-        })
-        .catch(error => {
-            console.log(error);
-            document.getElementById("result").innerText = "Error connecting to server";
-        });
-    }
-</script>
