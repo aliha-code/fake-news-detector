@@ -3,9 +3,14 @@ print("App is starting...")
 import os
 import requests
 from flask import Flask, render_template, request, jsonify
+from flask_cors import CORS
 from model import predict_news
 
 app = Flask(__name__)
+
+# 🔥 Enable CORS (VERY IMPORTANT)
+CORS(app)
+
 
 # Home route
 @app.route('/')
@@ -18,12 +23,12 @@ def home():
 def predict():
     text = request.json['text']
 
-    # 🔥 Get prediction from model
+    # Get prediction from model
     result, prob = predict_news(text)
 
     sources = []
 
-    # 📰 Fetch real news sources if prediction is REAL
+    # Fetch real news sources if prediction is REAL
     if result == 1:
         try:
             api_key = os.getenv("NEWS_API_KEY")
@@ -38,10 +43,9 @@ def predict():
 
     # Return response
     return jsonify({
-        "prediction": "Real" if result == 1 else "Fake",
-        "score": round(prob * 100, 2),
-        "sources": sources
-    })
+    "prediction": "Real" if result == 1 else "Fake",
+    "sources": sources
+})
 
 
 # Run app (Render compatible)
