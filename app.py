@@ -8,7 +8,7 @@ from model import predict_news
 
 app = Flask(__name__)
 
-# 🔥 Enable CORS (VERY IMPORTANT)
+# ✅ Enable CORS (needed for Vercel → Render connection)
 CORS(app)
 
 
@@ -21,31 +21,38 @@ def home():
 # Prediction route
 @app.route('/predict', methods=['POST'])
 def predict():
-    text = request.json['text']
+    try:
+        text = request.json.get('text', '')
 
-    # Get prediction from model
-    result, prob = predict_news(text)
+        # Get prediction from model
+        result, prob = predict_news(text)
 
-    sources = []
+        sources = []
 
-    # Fetch real news sources if prediction is REAL
-    if result == 1:
-        try:
-            api_key = os.getenv("NEWS_API_KEY")
+        # Fetch real news sources (only if REAL)
+        if result == 1:
+            try:
+                api_key = os.getenv("NEWS_API_KEY")
 
-            url = f"https://newsapi.org/v2/everything?q={text[:50]}&apiKey={api_key}"
-            response = requests.get(url).json()
+                if api_key:
+                    url = f"https://newsapi.org/v2/everything?q={text[:50]}&apiKey={api_key}"
+                    response = requests.get(url).json()
 
-            for article in response.get("articles", [])[:3]:
-                sources.append(article["url"])
-        except:
-            sources = []
+                    for article in response.get("articles", [])[:3]:
+                        sources.append(article.get("url", ""))
+            except:
+                sources = []
 
-    # Return response
-    return jsonify({
-    "prediction": "Real" if result == 1 else "Fake",
-    "sources": sources
-})
+        # Return response (NO score, only prediction + sources)
+        return jsonify({
+            "prediction": "Real" if result == 1 else "Fake",
+            "sources": sources
+        })
+
+    except Exception as e:
+        return jsonify({
+            "error": str(e)
+        })
 
 
 # Run app (Render compatible)
