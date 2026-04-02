@@ -68,7 +68,19 @@
 
     <script>
     function checkNews() {
-        let text = document.getElementById("newsText").value;
+        let text = document.getElementById("newsText").value.trim();
+
+        // ✅ Empty input check
+        if (text === "") {
+            alert("Please enter some news text");
+            return;
+        }
+
+        // ✅ Short text check
+        if (text.split(" ").length < 10) {
+            alert("Please enter full news content for better accuracy");
+            return;
+        }
 
         let resultDiv = document.getElementById("result");
         resultDiv.innerHTML = "Checking... ⏳";
